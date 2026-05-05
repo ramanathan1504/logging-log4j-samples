@@ -93,6 +93,38 @@
   </build>
   <profiles>
     <profile>
+      <id>run-jlink-launcher</id>
+      <activation>
+        <property>
+          <name>runJlinkLauncher</name>
+          <value>true</value>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>run-custom-jlink-launcher</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>verify</phase>
+                <configuration>
+                  <executable>${jlink.launcher.path}</executable>
+                  <workingDirectory>${project.basedir}</workingDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
       <id>windows</id>
       <activation>
         <os>
