@@ -29,7 +29,7 @@
 
   <properties>
     <maven-jlink-plugin.version>3.2.0</maven-jlink-plugin.version>
-    <!-- Default path for Linux/macOS runners -->
+    <!-- Default path for macOS/Linux (No extension) -->
     <jlink.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink</jlink.launcher.path>
   </properties>
 
@@ -70,7 +70,10 @@
   </build>
 
   <profiles>
-    <!-- Use this profile to run the image in CI: mvn verify -DrunJlinkLauncher=true -->
+    <!--
+       This profile handles the actual execution.
+       It is activated by -DrunJlinkLauncher=true
+    -->
     <profile>
       <id>run-jlink-launcher</id>
       <activation>
@@ -102,7 +105,7 @@
       </build>
     </profile>
 
-    <!-- Corrected Windows Profile -->
+    <!-- Windows specific property override -->
     <profile>
       <id>windows</id>
       <activation>
@@ -111,7 +114,7 @@
         </os>
       </activation>
       <properties>
-        <!-- Updated to .bat extension -->
+        <!-- Windows uses .bat for jlink launchers -->
         <jlink.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink.bat</jlink.launcher.path>
       </properties>
     </profile>
