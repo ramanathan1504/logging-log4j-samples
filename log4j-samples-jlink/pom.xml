@@ -28,26 +28,21 @@
   <name>Apache Log4j Samples: JLink custom JRE</name>
 
   <properties>
-    <!-- Plugin version -->
     <maven-jlink-plugin.version>3.2.0</maven-jlink-plugin.version>
-    <!-- OS-specific launcher path for exec-maven-plugin -->
+    <!-- Default path for Linux/macOS runners -->
     <jlink.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink</jlink.launcher.path>
   </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
     </dependency>
-
-    <!-- Runtime dependencies -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.apache.logging.log4j.samples</groupId>
       <artifactId>log4j-samples-configuration</artifactId>
@@ -58,28 +53,10 @@
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
+
   <build>
     <plugins>
-      <!-- Add exec-maven-plugin for running the jlink launcher in a platform-correct way -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>run-custom-jlink-launcher</id>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <phase>verify</phase>
-            <configuration>
-              <executable>${jlink.launcher.path}</executable>
-              <workingDirectory>${project.basedir}</workingDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jlink-plugin</artifactId>
@@ -91,7 +68,9 @@
       </plugin>
     </plugins>
   </build>
+
   <profiles>
+    <!-- Use this profile to run the image in CI: mvn verify -DrunJlinkLauncher=true -->
     <profile>
       <id>run-jlink-launcher</id>
       <activation>
@@ -100,7 +79,6 @@
           <value>true</value>
         </property>
       </activation>
-
       <build>
         <plugins>
           <plugin>
@@ -124,6 +102,7 @@
       </build>
     </profile>
 
+    <!-- Corrected Windows Profile -->
     <profile>
       <id>windows</id>
       <activation>
@@ -132,7 +111,8 @@
         </os>
       </activation>
       <properties>
-        <jlink.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink.exe</jlink.launcher.path>
+        <!-- Updated to .bat extension -->
+        <jlink.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink.bat</jlink.launcher.path>
       </properties>
     </profile>
   </profiles>
