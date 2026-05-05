@@ -29,8 +29,8 @@
 
   <properties>
     <maven-jlink-plugin.version>3.2.0</maven-jlink-plugin.version>
-    <!-- Default path for macOS/Linux (No extension) -->
-    <jlink.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink</jlink.launcher.path>
+    <!-- Use a unique name to avoid inheritance issues from the Parent BOM -->
+    <final.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink</final.launcher.path>
   </properties>
 
   <dependencies>
@@ -66,56 +66,43 @@
           <launcher>log4j-samples-jlink=org.apache.logging.log4j.samples.jlink/org.apache.logging.log4j.samples.jlink.Main</launcher>
         </configuration>
       </plugin>
+
+      <!--
+        We use 'combine.self="override"' to stop the Parent POM
+        from forcing its own 'exec' configuration on us.
+      -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>run-custom-jlink-launcher</id>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration combine.self="override">
+              <skip>${skipTests}</skip>
+              <executable>${final.launcher.path}</executable>
+              <workingDirectory>${project.basedir}</workingDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
   <profiles>
-    <!--
-       This profile handles the actual execution.
-       It is activated by -DrunJlinkLauncher=true
-    -->
+    <!-- On Windows runners, change extension to .bat -->
     <profile>
-      <id>run-jlink-launcher</id>
-      <activation>
-        <property>
-          <name>runJlinkLauncher</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>run-custom-jlink-launcher</id>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <phase>verify</phase>
-                <configuration>
-                  <executable>${jlink.launcher.path}</executable>
-                  <workingDirectory>${project.basedir}</workingDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <!-- Windows specific property override -->
-    <profile>
-      <id>windows</id>
+      <id>windows-override</id>
       <activation>
         <os>
           <family>Windows</family>
         </os>
       </activation>
       <properties>
-        <!-- Windows uses .bat for jlink launchers -->
-        <jlink.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink.bat</jlink.launcher.path>
+        <final.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink.bat</final.launcher.path>
       </properties>
     </profile>
   </profiles>
