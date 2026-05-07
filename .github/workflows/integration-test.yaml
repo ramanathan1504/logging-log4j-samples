@@ -58,7 +58,8 @@ jobs:
       maven-args: |
         -Dlog4j.version=${{ inputs.log4j-version }}
         -Dlog4j.repository.url=${{ inputs.log4j-repository-url }}
-      repository: 'apache/logging-log4j-samples'
+      # CHANGE THIS LINE:
+      repository: ${{ github.repository }}
       ref: ${{ inputs.samples-ref }}
       test-report-suffix: '-it'
 
