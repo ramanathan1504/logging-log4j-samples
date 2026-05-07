@@ -15,7 +15,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/xml-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.logging.log4j.samples</groupId>
@@ -29,14 +29,12 @@
 
   <properties>
     <maven-jlink-plugin.version>3.2.0</maven-jlink-plugin.version>
-
     <!-- Base path for the launcher created by jlink -->
-    <jlink.launcher.binary>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink</jlink.launcher.binary>
-
-    <!-- Default settings for Mac/Linux -->
-    <jlink.launcher.cmd>${jlink.launcher.binary}</jlink.launcher.cmd>
-    <jlink.launcher.arg0 />
-    <jlink.launcher.arg1 />
+    <jlink.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink</jlink.launcher.path>
+    <!-- Defaults for Unix/macOS -->
+    <exec.launcher.cmd>${jlink.launcher.path}</exec.launcher.cmd>
+    <exec.launcher.arg0 />
+    <exec.launcher.arg1 />
   </properties>
 
   <dependencies>
@@ -85,11 +83,10 @@
             <phase>verify</phase>
             <configuration combine.self="override">
               <skip>${skipTests}</skip>
-              <executable>${jlink.launcher.cmd}</executable>
+              <executable>${exec.launcher.cmd}</executable>
               <arguments>
-                <!-- On Mac these are empty; on Windows these are /c and the .bat path -->
-                <argument>${jlink.launcher.arg0}</argument>
-                <argument>${jlink.launcher.arg1}</argument>
+                <argument>${exec.launcher.arg0}</argument>
+                <argument>${exec.launcher.arg1}</argument>
               </arguments>
               <workingDirectory>${project.basedir}</workingDirectory>
             </configuration>
@@ -108,10 +105,10 @@
         </os>
       </activation>
       <properties>
-        <!-- Use 'cmd /c' to ensure Windows runs the .bat file correctly -->
-        <jlink.launcher.cmd>cmd</jlink.launcher.cmd>
-        <jlink.launcher.arg0>/c</jlink.launcher.arg0>
-        <jlink.launcher.arg1>${jlink.launcher.binary}.bat</jlink.launcher.arg1>
+        <!-- On Windows, we run via 'cmd /c' to handle the .bat extension properly -->
+        <exec.launcher.cmd>cmd</exec.launcher.cmd>
+        <exec.launcher.arg0>/c</exec.launcher.arg0>
+        <exec.launcher.arg1>${jlink.launcher.path}.bat</exec.launcher.arg1>
       </properties>
     </profile>
   </profiles>
