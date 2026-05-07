@@ -29,8 +29,12 @@
 
   <properties>
     <maven-jlink-plugin.version>3.2.0</maven-jlink-plugin.version>
-    <!-- Use a unique name to avoid inheritance issues from the Parent BOM -->
-    <final.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink</final.launcher.path>
+    <jlink.binary.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink</jlink.binary.path>
+
+    <!-- Default execution settings for Unix/macOS -->
+    <exec.executable>${jlink.binary.path}</exec.executable>
+    <exec.arg0 />
+    <exec.arg1 />
   </properties>
 
   <dependencies>
@@ -67,10 +71,6 @@
         </configuration>
       </plugin>
 
-      <!--
-        We use 'combine.self="override"' to stop the Parent POM
-        from forcing its own 'exec' configuration on us.
-      -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -83,7 +83,12 @@
             <phase>verify</phase>
             <configuration combine.self="override">
               <skip>${skipTests}</skip>
-              <executable>${final.launcher.path}</executable>
+              <executable>${exec.executable}</executable>
+              <arguments>
+                <!-- These arguments are only populated via the Windows profile -->
+                <argument>${exec.arg0}</argument>
+                <argument>${exec.arg1}</argument>
+              </arguments>
               <workingDirectory>${project.basedir}</workingDirectory>
             </configuration>
           </execution>
@@ -93,16 +98,18 @@
   </build>
 
   <profiles>
-    <!-- On Windows runners, change extension to .bat -->
     <profile>
       <id>windows-override</id>
       <activation>
         <os>
-          <family>Windows</family>
+          <family>windows</family>
         </os>
       </activation>
       <properties>
-        <final.launcher.path>${project.build.directory}/maven-jlink/default/bin/log4j-samples-jlink.bat</final.launcher.path>
+        <!-- On Windows, we must use 'cmd /c' to run the .bat script reliably -->
+        <exec.executable>cmd</exec.executable>
+        <exec.arg0>/c</exec.arg0>
+        <exec.arg1>${jlink.binary.path}.bat</exec.arg1>
       </properties>
     </profile>
   </profiles>
